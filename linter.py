@@ -35,10 +35,12 @@ class Nim(Linter):
     )
 
     def cmd(self):
+        """Update regex with current filename and return cmd."""
         self.update_regex()
         return self.base_cmd
 
     def update_regex(self):
+        """Update regex with current filename."""
         filename = os.path.basename(self.view.file_name())
         self.regex = re.compile(filename + self.base_regex)
 

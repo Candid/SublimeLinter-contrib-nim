@@ -20,24 +20,27 @@ class Nim(Linter):
     """Provides an interface to nim."""
 
     syntax = 'nim'
-    cmd = 'nim check'
-    executable = None
+    base_cmd = 'nim check'
+    executable = 'nim'
     version_args = '--version'
     version_re = r'(?P<version>\d+\.\d+\.\d+)'
     version_requirement = '>= 0.11.2'
 
     # Example:
     # obj.nim(106, 3) Error: not all cases are covered
+    base_regex = (
+        r'\((?P<line>\d+), (?P<col>\d+)\) '
+        r'(?:(?P<error>Error: )|(?P<warning>(Warning:)|(Hint:) ))'
+        r'(?P<message>.+)'
+    )
 
-    @property
-    def regex(self):
+    def cmd(self):
+        self.update_regex()
+        return self.base_cmd
+
+    def update_regex(self):
         filename = os.path.basename(self.view.file_name())
-        r = (
-            r'\((?P<line>\d+), (?P<col>\d+)\) '
-            r'(?:(?P<error>Error: )|(?P<warning>(Warning:)|(Hint:) ))'
-            r'(?P<message>.+)'
-        )
-        return re.compile(filename + r)
+        self.regex = re.compile(filename + self.base_regex)
 
     multiline = False
     line_col_base = (1, 1)
